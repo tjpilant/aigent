@@ -1,52 +1,52 @@
-AIGENT: Intelligent Document Processing and AI Agent Toolkit
+# AIGENT: Intelligent Document Processing and AI Agent Toolkit
 
-AIGent: Intelligent PDF-to-JSONL Converter and AI Training Data Preparation Tool
-Project Overview
+## Project Overview
 
 AIGENT is an advanced toolkit designed for AI researchers, developers, and data scientists working on large language models and AI agents. It combines intelligent document processing with dynamic AI agent trait management and prompt generation.
 
 
-Key Features
+### Key Features
 
-1.**Document Conversion**: Convert various document formats (PDF, etc.) to JSONL for AI training.
-2.**AI Agent Trait Management**: Hierarchical database for managing AI agent traits and characteristics.
-3.**Dynamic Prompt Generation**: Context-aware prompt generation for multiple use cases (solo tasks, agent swarms, user-editable prompts).
-4.**Metadata Tagging**: Flexible system for enhanced AI training data.
-5.**Intuitive GUI**: Easy management of agent traits and prompt generation.
-6.**Extensible Architecture**: Support for future AI development paradigms.
 
-Development Goals
+1. **Document Conversion**: Convert various document formats (PDF, etc.) to JSONL for AI training.
+2. **AI Agent Trait Management**: Hierarchical database for managing AI agent traits and characteristics.
+3. **Dynamic Prompt Generation**: Context-aware prompt generation for multiple use cases (solo tasks, agent swarms, user-editable prompts).
+4. **Metadata Tagging**: Flexible system for enhanced AI training data.
+5. **Intuitive GUI**: Easy management of agent traits and prompt generation.
+6. **Extensible Architecture**: Support for future AI development paradigms.
+
+### Development Goals
 
 1. Enhance user experience through an intuitive and efficient GUI.
 2. Improve data quality and relevance for AI training purposes.
 3. Streamline the process of preparing large volumes of document data for AI consumption.
 4. Provide flexibility in defining AI agent characteristics and training parameters.
-Current Implementation
+
+### Current Implementation
+Core Functionality
+
+- PDF to JSONL conversion
+- Data validation using marshmallow schemas
+- Configuration file management
+- Threaded conversion process for responsive GUI
 
 GUI Components
 
-● General tab: Input/output file selection
-● Project Info tab: Project-specific details
-● Agent Traits tab: Customizable AI agent characteristics
-● Progress bar: Visual representation of conversion progress
-● Log viewer: Detailed conversion process information
-● Action buttons: Convert, Reset to Defaults, Save Configuration
+- General tab: Input/output file selection
+- Project Info tab: Project-specific details
+- Agent Traits tab: Customizable AI agent characteristics
+- Progress bar: Visual representation of conversion progress
+- Log viewer: Detailed conversion process information
+- Action buttons: Convert, Reset to Defaults, Save Configuration
 
-Core Functionality
-
-● PDF to JSONL conversion
-● Data validation using marshmallow schemas
-● Configuration file management
-● Threaded conversion process for responsive GUI
-
-Todo List
+### Todo List
 
 1. Refine and expand agent trait definitions
 2. Implement more sophisticated multi-document relationship handling
 3. Enhance error handling and user feedback mechanisms
 4. Optimize performance for large-scale document processing
 
-Future Developments
+### Future Developments
 
 1. Adding more detailed error handling and validation feedback
 2. Implementing a way to load and switch between different saved configurations
@@ -56,19 +56,18 @@ Future Developments
 6. Developing a prompt engineer that can translate the JSON data into Agent Instruction
 markdown files
 
-Prompt Engineer Development
+### Prompt Engineer Development
 
 The prompt engineer will be designed to:
 
-● Parse the JSONL output from AIGent
-● Extract relevant information about agent traits and project specifics
-● Generate structured markdown files containing agent instructions
-● Customize instructions based on the defined agent characteristics
-● Include specific commands and guidelines as demonstrated in the Browsing Agent
+- Parse the JSONL output from AIGent
+- Extract relevant information about agent traits and project specifics
+- Generate structured markdown files containing agent instructions
+- Customize instructions based on the defined agent characteristics
+- Include specific commands and guidelines as demonstrated in the Browsing Agent
 
-Instructions example
-Getting Started
-Installation
+### Instructions example
+Getting Started Installation
 AIGent can be run either locally or using Docker. Both methods require Python 3.11 or later.
 
 Local Installation
@@ -82,7 +81,7 @@ source venv/bin/activate  # On Windows, use venv\Scripts\activate
 4. Install the required dependencies (packages):
 pip install -r requirements.txt
 
-Docker Installation
+### Docker Installation
 
 1. Ensure you have Docker installed on your system.
 2. Build the Docker image:
