@@ -1,5 +1,4 @@
-#AIGENT
-AIGENT: Intelligent Document Processing and AI Agent Toolkit
+#AIGENT: Intelligent Document Processing and AI Agent Toolkit
 
 
 Project Overview
