@@ -1,12 +1,12 @@
-#AIGENT: Intelligent Document Processing and AI Agent Toolkit
+# AIGENT: Intelligent Document Processing and AI Agent Toolkit
 
 
-Project Overview
+## Project Overview
 
 AIGENT is an advanced toolkit designed for AI researchers, developers, and data scientists working on large language models and AI agents. It combines intelligent document processing with dynamic AI agent trait management and prompt generation.
 
 
-Key Features
+### Key Features
 
 1.**Document Conversion**: Convert various document formats (PDF, etc.) to JSONL for AI training.
 2.**AI Agent Trait Management**: Hierarchical database for managing AI agent traits and characteristics.
