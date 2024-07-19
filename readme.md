@@ -60,11 +60,11 @@ Prompt Engineer Development
 
 The prompt engineer will be designed to:
 
-● Parse the JSONL output from AIGent
-● Extract relevant information about agent traits and project specifics
-● Generate structured markdown files containing agent instructions
-● Customize instructions based on the defined agent characteristics
-● Include specific commands and guidelines as demonstrated in the Browsing Agent
+**Parse the JSONL output from AIGent
+**Extract relevant information about agent traits and project specifics
+**Generate structured markdown files containing agent instructions
+**Customize instructions based on the defined agent characteristics
+**Include specific commands and guidelines as demonstrated in the Browsing Agent
 
 Instructions example
 Getting Started
