@@ -8,6 +8,7 @@ AIGENT is an advanced toolkit designed for AI researchers, developers, and data 
 
 ### Key Features
 
+
 1.**Document Conversion**: Convert various document formats (PDF, etc.) to JSONL for AI training.
 2.**AI Agent Trait Management**: Hierarchical database for managing AI agent traits and characteristics.
 3.**Dynamic Prompt Generation**: Context-aware prompt generation for multiple use cases (solo tasks, agent swarms, user-editable prompts).
