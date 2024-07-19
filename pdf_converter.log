@@ -1,0 +1,16 @@
+2024-07-16 03:46:49,300:WARNING:Config file not found: config.json
+2024-07-16 03:48:28,267:INFO:Starting to split large PDF: /home/tjpilant/aiengineers/aigent/test_pdfs/MakeMoneyInet.pdf
+2024-07-16 03:48:28,308:INFO:Large PDF splitting completed. Output files saved with prefix: /home/tjpilant/aiengineers/aigent/tests/MakeMoneyInet
+2024-07-16 03:48:40,251:INFO:Configuration saved to config.json
+2024-07-16 03:49:32,817:INFO:Starting conversion of /home/tjpilant/aiengineers/aigent/test_pdfs/MakeMoneyInet.pdf
+2024-07-16 03:49:32,819:INFO:Conversion completed. Output saved to /home/tjpilant/aiengineers/aigent/tests/MakeMoneyInet.jsonl
+2024-07-16 03:49:40,995:INFO:Configuration saved to config.json
+2024-07-16 04:01:08,772:INFO:Starting conversion of /home/tjpilant/aiengineers/aigent/test_pdfs/MakeMoneyInet.pdf
+2024-07-16 04:01:08,788:INFO:Conversion completed. Output saved to /home/tjpilant/aiengineers/aigent/tests/MakeMoneyInet2.jsonl
+2024-07-16 04:01:10,748:INFO:Configuration saved to config.json
+2024-07-16 04:33:21,785:INFO:Starting conversion of /home/tjpilant/aiengineers/aigent/MakeMoneyInet.pdf
+2024-07-16 04:33:28,868:INFO:Conversion completed. Output saved to MakeMoneyInet.jsonl
+2024-07-16 04:33:34,840:INFO:Configuration saved to config.json
+2024-07-16 04:35:12,570:INFO:Starting conversion of /home/tjpilant/aiengineers/aigent/MakeMoneyInet.pdf
+2024-07-16 04:35:15,807:INFO:Conversion completed. Output saved to /home/tjpilant/aiengineers/aigent/MakeMoneyInet.jsonl
+2024-07-16 04:35:19,139:INFO:Configuration saved to config.json

@@ -1,18 +1,19 @@
-# AIGent PDF to JSONL Converter
+AIGENT: Intelligent Document Processing and AI Agent Toolkit
 
 AIGent: Intelligent PDF-to-JSONL Converter and AI Training Data Preparation Tool
 Project Overview
 
-AIGent is an advanced tool designed to streamline the process of converting PDF documents into JSONL format for AI training purposes. It features a user-friendly graphical interface, robust data validation, and customizable agent trait definitions to enhance the quality and relevance of AI training data.
+AIGENT is an advanced toolkit designed for AI researchers, developers, and data scientists working on large language models and AI agents. It combines intelligent document processing with dynamic AI agent trait management and prompt generation.
+
 
 Key Features
 
-1. PDF to JSONL Conversion: Efficiently convert PDF documents to JSONL format suitable for AI training.
-2. Graphical User Interface (GUI): User-friendly interface for easy interaction and data input.
-3. Data Validation: Ensure data integrity and consistency through built-in validation mechanisms.
-4. Agent Trait Customization: Define and customize AI agent traits for targeted training.
-5. Progress Tracking: Real-time progress bar and log viewer for conversion process monitoring.
-6. Configuration Management: Save, load, and reset configuration settings for different projects.
+1.**Document Conversion**: Convert various document formats (PDF, etc.) to JSONL for AI training.
+2.**AI Agent Trait Management**: Hierarchical database for managing AI agent traits and characteristics.
+3.**Dynamic Prompt Generation**: Context-aware prompt generation for multiple use cases (solo tasks, agent swarms, user-editable prompts).
+4.**Metadata Tagging**: Flexible system for enhanced AI training data.
+5.**Intuitive GUI**: Easy management of agent traits and prompt generation.
+6.**Extensible Architecture**: Support for future AI development paradigms.
 
 Development Goals
 
