@@ -15,7 +15,7 @@ AIGENT is an advanced toolkit designed for AI researchers, developers, and data 
 5.**Intuitive GUI**: Easy management of agent traits and prompt generation.
 6.**Extensible Architecture**: Support for future AI development paradigms.
 
-Development Goals
+### Development Goals
 
 1. Enhance user experience through an intuitive and efficient GUI.
 2. Improve data quality and relevance for AI training purposes.
@@ -60,11 +60,11 @@ Prompt Engineer Development
 
 The prompt engineer will be designed to:
 
-**Parse the JSONL output from AIGent
-**Extract relevant information about agent traits and project specifics
-**Generate structured markdown files containing agent instructions
-**Customize instructions based on the defined agent characteristics
-**Include specific commands and guidelines as demonstrated in the Browsing Agent
+- Parse the JSONL output from AIGent
+- Extract relevant information about agent traits and project specifics
+- Generate structured markdown files containing agent instructions
+- Customize instructions based on the defined agent characteristics
+- Include specific commands and guidelines as demonstrated in the Browsing Agent
 
 Instructions example
 Getting Started
