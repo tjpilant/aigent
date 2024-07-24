@@ -1,13 +1,49 @@
 import json
-import pdfplumber
-import PyPDF2
 import logging
 from datetime import datetime
+
+import pdfplumber
+import PyPDF2
 
 # Set up logging
 logging.basicConfig(filename='pdf_converter.log', level=logging.INFO, 
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
+
+def load_config(config_file):
+    """Loads configuration from a JSON file."""
+    try:
+        with open(config_file, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        logging.warning(f"Config file not found: {config_file}")
+        return {}
+    except json.JSONDecodeError:
+        logging.error(f"Invalid JSON in config file: {config_file}")
+        return {}
+
+def save_config(config, config_file):
+    """Saves configuration to a JSON file."""
+    try:
+        with open(config_file, 'w') as f:
+            json.dump(config, f, indent=4)
+        logging.info(f"Configuration saved to {config_file}")
+    except Exception as e:
+        logging.error(f"Error saving configuration: {str(e)}")
+        raise
+
+def split_large_pdf(input_path, output_dir, max_pages=100):
+    with pdfplumber.open(input_path) as pdf:
+        total_pages = len(pdf.pages)
+        for i in range(0, total_pages, max_pages):
+            output_path = os.path.join(output_dir, f"split_{i//max_pages + 1}.pdf")
+            with pdfplumber.open(input_path) as pdf:
+                pdf_writer = PyPDF2.PdfWriter()
+                for page in range(i, min(i + max_pages, total_pages)):
+                    pdf_writer.add_page(pdf.pages[page])
+                with open(output_path, 'wb') as output_file:
+                    pdf_writer.write(output_file)
+    return [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.startswith("split_")]
 class ProjectInfo:
     def __init__(self, project_title="", project_id="", target_agent="", agent_role="", 
                  processor_name="", dataset_name="", version="1.0"):
@@ -30,6 +66,7 @@ class AgentTraits:
         self.ethical_guidelines = ethical_guidelines
 
 import os
+
 
 def start_conversion(input_file, output_file, project_info, agent_traits, start_page=None, end_page=None):
     try:
