@@ -1,7 +1,7 @@
 import sys
 import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QLabel, QFileDialog, QMessageBox, QSpinBox, QComboBox
-from pdf_converter import ProjectInfo, AgentTraits, start_conversion, split_large_pdf, load_config, save_config
+from pdf_converter import ProjectInfo, AgentTraits, start_conversion, load_config, save_config
 
 class AIGentGUI(QMainWindow):
     """
@@ -52,28 +52,10 @@ class AIGentGUI(QMainWindow):
         layout.addWidget(QLabel('Data Purpose:'))
         layout.addWidget(self.data_purpose)
 
-        # Large PDF handling
-        self.pages_per_file = QSpinBox(self)
-        self.pages_per_file.setMinimum(1)
-        self.pages_per_file.setMaximum(1000)
-        self.pages_per_file.setValue(self.config.get('pages_per_file', 500))
-        layout.addWidget(QLabel('Pages per file:'))
-        layout.addWidget(self.pages_per_file)
-
-        self.output_format = QComboBox(self)
-        self.output_format.addItems(['JSONL', 'PDF'])
-        self.output_format.setCurrentText(self.config.get('output_format', 'JSONL'))
-        layout.addWidget(QLabel('Output format:'))
-        layout.addWidget(self.output_format)
-
-        # Convert buttons
+        # Convert button
         convert_button = QPushButton('Convert PDF to JSONL', self)
         convert_button.clicked.connect(self.convert_pdf)
         layout.addWidget(convert_button)
-
-        process_large_button = QPushButton('Process Large PDF', self)
-        process_large_button.clicked.connect(self.process_large_pdf)
-        layout.addWidget(process_large_button)
 
     def select_input_file(self):
         """
@@ -139,35 +121,6 @@ class AIGentGUI(QMainWindow):
             save_config(self.config, 'config.json')
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred during conversion: {str(e)}")
-
-    def process_large_pdf(self):
-        if not self.validate_inputs():
-            return
-        
-        input_file = self.input_edit.text()
-        output_prefix = os.path.splitext(self.output_edit.text())[0]
-        project_title = self.project_title.text()
-        data_purpose = self.data_purpose.text()
-        pages_per_file = self.pages_per_file.value()
-        output_format = self.output_format.currentText().lower()
-
-        project_info = ProjectInfo(project_title=project_title)
-        agent_traits = AgentTraits(data_purpose=data_purpose)
-
-        try:
-            split_large_pdf(input_file, output_prefix, pages_per_file, output_format, project_info, agent_traits)
-            QMessageBox.information(self, "Success", f"Large PDF processed. Output files saved with prefix: {output_prefix}")
-            
-            # Update and save config
-            self.config.update({
-                'project_title': project_title,
-                'data_purpose': data_purpose,
-                'pages_per_file': pages_per_file,
-                'output_format': output_format,
-            })
-            save_config(self.config, 'config.json')
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"An error occurred during processing: {str(e)}")
 
 def main():
     """Main function to run the application."""
