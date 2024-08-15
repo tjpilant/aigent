@@ -22,3 +22,12 @@ Thumbs.db
 # Output files
 *.jsonl
 *.pdf
+# API and encryption keys
+.env
+.encryption_key
+
+# Other project-specific ignores can be added here
+client_secret_997980018332-v1pnpb3gm94i8u4dqm3fg29jfb84dai4.apps.googleusercontent.com
+aigent-430602-ba4f3db6c362.json
+/home/tjpilant/aiengineers/aigent/tests
+access_token.txt
