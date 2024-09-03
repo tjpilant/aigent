@@ -6,12 +6,13 @@ AIGENT is a comprehensive toolkit for AI development, focusing on document proce
 
 ## Key Features
 
-1. **Document Conversion**: Convert PDF documents to JSONL format for AI training, with future plans to support various document formats (DOCX, TXT).
+1. **Document Conversion**: Convert PDF, DOCX, and image files to JSONL, TXT, MD, and DOCX formats for AI training.
 2. **AI Agent Trait Management**: Integrated system for managing AI agent traits and characteristics, with a vision for a hierarchical database structure.
 3. **Dynamic Prompt Generation**: Context-aware prompt generation for multiple use cases, laying the groundwork for sophisticated agent interactions.
 4. **PyQt5-based GUI**: User-friendly desktop interface for document conversion and trait management, serving as a foundation for future agent swarm management features.
 5. **Configuration Management**: Persistent settings for improved user experience, essential for managing complex AI agent configurations.
 6. **Logging System**: Comprehensive logging for better debugging and user support, crucial for monitoring agent activities and interactions.
+7. **OCR Integration**: Support for both Tesseract OCR and Google Cloud Vision API for enhanced text extraction from images and PDFs.
 
 ## Installation
 
@@ -34,24 +35,62 @@ AIGENT is a comprehensive toolkit for AI development, focusing on document proce
    ```
 2. Run the AIGENT GUI:
    ```
-   python aigent_gui.py
+   python -m aigent.aigent_gui
    ```
 3. Use the GUI to:
-   - Select an input PDF file
-   - Choose an output location for the JSONL file
+   - Select an input file (PDF, DOCX, or image)
+   - Choose an output location for the converted files
    - Enter project information and agent traits
-   - Convert the PDF to JSONL
+   - Select OCR options and output formats
+   - Convert the document
+
+## Setting Up Google Cloud Credentials
+
+To use AIGENT with Google Cloud services (e.g., Cloud Vision API), follow these steps:
+
+1. Obtain a Google Cloud JSON credentials file:
+   - Go to the [Google Cloud Console](https://console.cloud.google.com/)
+   - Navigate to "APIs & Services" > "Credentials"
+   - Create a new Service Account Key and download the JSON file
+2. Place the JSON file in a secure location on your system.
+3. Set up the credentials in AIGENT:
+   - Create a file named `setup_credentials.py` in your AIGENT project directory
+   - Add the following code to the file:
+     ```python
+     from aigent.api_manager import APIManager
+
+     def setup_google_cloud_credentials():
+         api_manager = APIManager()
+         credentials_path = '/path/to/your/google_cloud_credentials.json'
+         
+         if api_manager.set_google_cloud_credentials(credentials_path):
+             print(f"Successfully set Google Cloud credentials path: {credentials_path}")
+         else:
+             print(f"Failed to set Google Cloud credentials. Please check if the file exists: {credentials_path}")
+
+     if __name__ == "__main__":
+         setup_google_cloud_credentials()
+     ```
+   - Replace `/path/to/your/google_cloud_credentials.json` with the actual path to your JSON file
+4. Run the setup script:
+   ```
+   poetry run python setup_credentials.py
+   ```
+5. Verify the setup:
+   - The script will print a success message if the credentials are set correctly
+   - You can also check the `.env` file in your project directory to ensure the `GOOGLE_APPLICATION_CREDENTIALS` variable is set
+
+Note: Keep your credentials file secure and never commit it to version control. The `.env` file containing the credentials path should also be in your `.gitignore`.
 
 ## Future Directions
 
-While currently focused on robust PDF to JSONL conversion and trait management, AIGENT's roadmap includes:
+AIGENT's roadmap includes:
 
 1. Implementing agent swarm management capabilities for complex tasks.
-2. Expanding document conversion to support various formats.
-3. Developing a web interface for broader accessibility.
-4. Integrating with APIs like OpenAI and Anthropic for enhanced AI capabilities.
-5. Implementing intelligent PDF splitting based on content structure.
-6. Developing advanced visualization for document structure and AI agent interactions.
+2. Developing a web interface for broader accessibility.
+3. Integrating with APIs like OpenAI and Anthropic for enhanced AI capabilities.
+4. Implementing intelligent PDF splitting based on content structure.
+5. Developing advanced visualization for document structure and AI agent interactions.
 
 ## Contributing
 
@@ -75,6 +114,8 @@ AIGENT is open-source and licensed under the [MIT License](https://opensource.or
 - [PyQt5](https://www.riverbankcomputing.com/software/pyqt/) for the GUI framework
 - [pdfplumber](https://github.com/jsvine/pdfplumber) for PDF text extraction
 - [PyPDF2](https://pypdf2.readthedocs.io/en/latest/) for PDF manipulation
+- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) for optical character recognition
+- [Google Cloud Vision API](https://cloud.google.com/vision) for advanced OCR capabilities
 
 ## Contact
 
