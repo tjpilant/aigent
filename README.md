@@ -82,6 +82,32 @@ To use AIGENT with Google Cloud services (e.g., Cloud Vision API), follow these 
 
 Note: Keep your credentials file secure and never commit it to version control. The `.env` file containing the credentials path should also be in your `.gitignore`.
 
+## Development Process
+
+We use Git for version control and follow a feature branch workflow. Here's how to contribute to the project:
+
+1. Ensure you're on the master branch and it's up-to-date:
+   ```
+   git checkout master
+   git pull origin master
+   ```
+2. Create a new feature branch:
+   ```
+   git checkout -b feature-branch-name
+   ```
+3. Make your changes and commit them:
+   ```
+   git add .
+   git commit -m "Description of the changes"
+   ```
+4. Push your branch to the remote repository:
+   ```
+   git push origin feature-branch-name
+   ```
+5. Create a pull request on GitHub to merge your feature branch into master.
+
+Always create a new branch for each feature or bug fix to keep the development process organized and maintainable.
+
 ## Future Directions
 
 AIGENT's roadmap includes:
