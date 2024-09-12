@@ -9,7 +9,7 @@ def setup_google_cloud_credentials():
     """
     api_manager = APIManager()
     
-    credentials_path = '/home/tjpilant/aiengineers/aigent/aigent-430602-ba4f3db6c362.json'
+    credentials_path = ''
     
     if api_manager.set_google_cloud_credentials(credentials_path):
         print(f"Successfully set Google Cloud credentials path: {credentials_path}")
