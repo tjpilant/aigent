@@ -6,7 +6,7 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import Flow
 
 # Load client secrets
-client_secret_file = "client_secret_997980018332-v1pnpb3gm94i8u4dqm3fg29jfb84dai4.apps.googleusercontent.com.json"
+client_secret_file = ""
 with open(client_secret_file, "r") as f:
     client_config = json.load(f)
 
