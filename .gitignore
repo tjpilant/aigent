@@ -22,6 +22,7 @@ Thumbs.db
 # Output files
 *.jsonl
 *.pdf
+
 # API and encryption keys
 .env
 .encryption_key
@@ -29,8 +30,11 @@ Thumbs.db
 # Other project-specific ignores can be added here
 client_secret_997980018332-v1pnpb3gm94i8u4dqm3fg29jfb84dai4.apps.googleusercontent.com
 aigent-430602-ba4f3db6c362.json
-/home/tjpilant/aiengineers/aigent/tests
+tests/
 access_token.txt
 aiocr-gcv-api.json
 client_secret_997980018332-v1pnpb3gm94i8u4dqm3fg29jfb84dai4.apps.googleusercontent.com.json
 file_converter.log
+aigent/DevNotes
+setup_credentials.py
+updated_generate_oauth_token.py
