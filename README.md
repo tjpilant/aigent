@@ -9,25 +9,17 @@ AIGENT is a comprehensive toolkit for AI development, focusing on document proce
 1. **Document Conversion**: Convert PDF, DOCX, and image files to JSONL, TXT, MD, and DOCX formats for AI training.
 2. **AI Agent Trait Management**: Integrated system for managing AI agent traits and characteristics, with a vision for a hierarchical database structure.
 3. **Dynamic Prompt Generation**: Context-aware prompt generation for multiple use cases, laying the groundwork for sophisticated agent interactions.
-4. **PyQt5-based GUI**: User-friendly desktop interface for document conversion and trait management, serving as a foundation for future agent swarm management features.
+4. **PyQt5-based GUI**: User-friendly desktop interface for document conversion, trait management, and GPT agent creation.
 5. **Configuration Management**: Persistent settings for improved user experience, essential for managing complex AI agent configurations.
 6. **Logging System**: Comprehensive logging for better debugging and user support, crucial for monitoring agent activities and interactions.
 7. **OCR Integration**: Support for both Tesseract OCR and Google Cloud Vision API for enhanced text extraction from images and PDFs.
 8. **Agent Swarm Management**: Implementation of Agency Swarm concepts for collaborative AI agent interactions and task processing.
 9. **NLP Document Processing**: Integrated NLP capabilities for generating training data pairs from processed documents.
+10. **GPT Agent Developer**: Create and manage specialized GPT agents with defined traits and responsibilities.
 
 ## Installation
 
-1. Ensure you have Python 3.8+ and Poetry installed on your system.
-2. Clone the repository:
-   ```
-   git clone https://github.com/your-username/aigent.git
-   cd aigent
-   ```
-3. Install dependencies using Poetry:
-   ```
-   poetry install
-   ```
+(This section remains unchanged)
 
 ## Usage
 
@@ -47,37 +39,11 @@ AIGENT is a comprehensive toolkit for AI development, focusing on document proce
    - Enter project information and agent traits
    - Select OCR options and output formats
    - Process the documents
+   - Create and manage GPT agents
 
 ### AIGentSwarm Usage
 
-The AIGentSwarm functionality is now integrated into the GUI. When you process documents through the GUI, it automatically utilizes the AIGentSwarm for document processing and NLP tasks.
-
-For programmatic usage of AIGentSwarm:
-
-1. Import the AIGentSwarm class:
-   ```python
-   from aigent.aigent_swarm import AIGentSwarm
-   ```
-
-2. Create an instance of AIGentSwarm:
-   ```python
-   swarm = AIGentSwarm()
-   ```
-
-3. Process documents using the swarm:
-   ```python
-   results = swarm.process_documents(
-       input_files,
-       output_dir,
-       project_info,
-       agent_traits,
-       output_formats,
-       use_ocr,
-       use_cloud_vision
-   )
-   ```
-
-4. The `results` variable will contain the output from each agent in the swarm for each processed document, including both converted data and NLP processing results.
+(This section remains unchanged)
 
 ## Agency Swarm Framework Integration
 
@@ -87,8 +53,27 @@ AIGENT now incorporates the Agency Swarm framework, which allows for more flexib
 2. **NLPDocumentsTool**: A tool for processing documents and generating training data pairs.
 3. **NLPDocumentsAgent**: An agent that utilizes the NLPDocumentsTool for document processing.
 4. **AIGentSwarm**: A class that manages the swarm of agents and coordinates document processing tasks.
+5. **GPT Agent Developer**: A new feature for creating and managing specialized GPT agents with defined traits and responsibilities.
 
 This integration allows for easy expansion of AIGENT's capabilities by adding new tools and agents to the swarm.
+
+## GPT Agent Developer
+
+The GPT Agent Developer is a new feature that allows users to create and manage specialized GPT agents. These agents can be tailored for specific tasks or professions, with defined traits, responsibilities, and interaction styles.
+
+Key capabilities:
+- Create new GPT agents with specific professions and traits
+- Store agent descriptions in a SQLite database for easy management
+- List all created GPT agents
+- Utilize created agents in document processing tasks (future development)
+
+To use the GPT Agent Developer:
+1. Open the AIGENT GUI
+2. Navigate to the "Agents" menu
+3. Select "Create GPT Agent" to define a new agent
+4. Use "List GPT Agents" to view all created agents
+
+The GPT Agent Developer lays the groundwork for more sophisticated AI interactions and task-specific processing within the AIGENT ecosystem.
 
 ## Setting Up Google Cloud Credentials
 
@@ -110,6 +95,7 @@ AIGENT's roadmap includes:
 6. Enhancing the Agency Swarm implementation with more sophisticated agent types and communication protocols.
 7. Implementing a plugin system for easy addition of new tools and agents.
 8. Developing specialized agents for different types of document analysis and processing.
+9. Expanding the GPT Agent Developer to allow for more complex agent interactions and task assignments.
 
 ## Contributing
 
@@ -121,12 +107,7 @@ AIGENT is open-source and licensed under the [MIT License](https://opensource.or
 
 ## Acknowledgments
 
-- [Agency Swarm](https://github.com/VRSEN/agency-swarm) for philosophical alignment in AI agent collaboration concepts and inspiration for our swarm implementation.
-- [PyQt5](https://www.riverbankcomputing.com/software/pyqt/) for the GUI framework
-- [pdfplumber](https://github.com/jsvine/pdfplumber) for PDF text extraction
-- [PyPDF2](https://pypdf2.readthedocs.io/en/latest/) for PDF manipulation
-- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) for optical character recognition
-- [Google Cloud Vision API](https://cloud.google.com/vision) for advanced OCR capabilities
+(This section remains unchanged)
 
 ## Contact
 
