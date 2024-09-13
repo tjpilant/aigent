@@ -38,3 +38,6 @@ file_converter.log
 aigent/DevNotes
 setup_credentials.py
 updated_generate_oauth_token.py
+
+# Exclude DevNotes folder
+DevNotes/
