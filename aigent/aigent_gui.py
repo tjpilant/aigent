@@ -1,7 +1,7 @@
 # File: aigent/aigent_gui.py
 # Author: Tj Pilant
 # Description: GUI for the AIGent application
-# Version: 0.7.1
+# Version: 0.9.1
 
 import logging
 import os
@@ -22,23 +22,26 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QVBoxLayout,
     QWidget,
+    QMenuBar,
+    QMenu,
+    QAction,
 )
 
 from aigent.ai_service import AIService
 from aigent.api_manager import APIManager
-from aigent.file_converter import FileConverter
 from aigent.models import AgentTraits, ProjectInfo
+from aigent.aigent_swarm import AIGentSwarm
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class ProcessingThread(QThread):
     progress_update = pyqtSignal(int, int)
-    processing_complete = pyqtSignal(dict, dict)
+    processing_complete = pyqtSignal(list, dict)
     
-    def __init__(self, file_converter, input_files, output_dir, project_info, agent_traits, output_formats, use_ocr, use_cloud_vision):
+    def __init__(self, aigent_swarm, input_files, output_dir, project_info, agent_traits, output_formats, use_ocr, use_cloud_vision):
         super().__init__()
-        self.file_converter = file_converter
+        self.aigent_swarm = aigent_swarm
         self.input_files = input_files
         self.output_dir = output_dir
         self.project_info = project_info
@@ -48,26 +51,51 @@ class ProcessingThread(QThread):
         self.use_cloud_vision = use_cloud_vision
 
     def run(self):
-        results = {}
+        results = []
         errors = {}
         total_files = len(self.input_files)
         
-        for i, input_file in enumerate(self.input_files, 1):
-            try:
-                result = self.file_converter.convert_file(
-                    input_file,
-                    self.output_dir,
-                    self.project_info,
-                    self.agent_traits,
-                    self.output_formats,
-                    self.use_ocr,
-                    self.use_cloud_vision
-                )
-                results[input_file] = result
-            except Exception as e:
-                errors[input_file] = str(e)
-            
-            self.progress_update.emit(i, total_files)
+        try:
+            results = self.aigent_swarm.process_documents(
+                self.input_files,
+                self.output_dir,
+                self.project_info,
+                self.agent_traits,
+                self.output_formats,
+                self.use_ocr,
+                self.use_cloud_vision
+            )
+            for i, _ in enumerate(results, 1):
+                self.progress_update.emit(i, total_files)
+        except Exception as e:
+            errors['processing'] = str(e)
+        
+        self.processing_complete.emit(results, errors)
+
+class TrainingDataThread(QThread):
+    progress_update = pyqtSignal(int, int)
+    processing_complete = pyqtSignal(list, dict)
+    
+    def __init__(self, aigent_swarm, input_files, output_dir):
+        super().__init__()
+        self.aigent_swarm = aigent_swarm
+        self.input_files = input_files
+        self.output_dir = output_dir
+
+    def run(self):
+        results = []
+        errors = {}
+        total_files = len(self.input_files)
+        
+        try:
+            results = self.aigent_swarm.generate_training_data(
+                self.input_files,
+                self.output_dir
+            )
+            for i, _ in enumerate(results, 1):
+                self.progress_update.emit(i, total_files)
+        except Exception as e:
+            errors['processing'] = str(e)
         
         self.processing_complete.emit(results, errors)
 
@@ -78,7 +106,7 @@ class AIGentGUI(QMainWindow):
         try:
             self.api_manager = APIManager()
             self.ai_service = AIService()
-            self.file_converter = FileConverter()
+            self.aigent_swarm = AIGentSwarm()
             logging.info("Services initialized successfully")
         except Exception as e:
             logging.error(f"Error initializing services: {str(e)}")
@@ -89,6 +117,15 @@ class AIGentGUI(QMainWindow):
     def initUI(self):
         self.setWindowTitle("AIGent: Intelligent Document Processor")
         self.setGeometry(100, 100, 600, 500)
+
+        # Create menu bar
+        menubar = self.menuBar()
+        file_menu = menubar.addMenu('File')
+        
+        # Add "Generate Training Data" action
+        generate_training_data_action = QAction('Generate Training Data', self)
+        generate_training_data_action.triggered.connect(self.generate_training_data)
+        file_menu.addAction(generate_training_data_action)
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -230,7 +267,7 @@ class AIGentGUI(QMainWindow):
         agent_traits.add_trait("ai_model", ai_model)
 
         self.processing_thread = ProcessingThread(
-            self.file_converter,
+            self.aigent_swarm,
             input_files,
             output_dir,
             project_info,
@@ -243,6 +280,35 @@ class AIGentGUI(QMainWindow):
         self.processing_thread.processing_complete.connect(self.processing_finished)
         self.processing_thread.start()
 
+    def generate_training_data(self):
+        logging.info("Starting training data generation")
+        input_path = self.input_edit.text()
+        output_dir = self.output_edit.text()
+
+        if not input_path or not output_dir:
+            QMessageBox.warning(self, "Error", "Please select input files/directory and output directory.")
+            return
+
+        input_files = []
+        if os.path.isdir(input_path):
+            for root, _, files in os.walk(input_path):
+                for file in files:
+                    input_files.append(os.path.join(root, file))
+        else:
+            input_files = input_path.split(", ")
+
+        logging.debug(f"Input files for training data: {input_files}")
+        logging.debug(f"Output directory for training data: {output_dir}")
+
+        self.training_data_thread = TrainingDataThread(
+            self.aigent_swarm,
+            input_files,
+            output_dir
+        )
+        self.training_data_thread.progress_update.connect(self.update_progress)
+        self.training_data_thread.processing_complete.connect(self.training_data_finished)
+        self.training_data_thread.start()
+
     def update_progress(self, current, total):
         self.progress_bar.setValue(int((current / total) * 100))
 
@@ -250,15 +316,19 @@ class AIGentGUI(QMainWindow):
         message = "Processing complete.\n\n"
         message += self.generate_summary(results)
         message += "\nOutput files:\n"
-        for input_file, output_files in results.items():
+        for result in results:
+            input_file = result['input_file']
+            converted_data = result['converted_data']
+            nlp_result = result['nlp_result']
             message += f"Processed {input_file}:\n"
-            for format, file_path in output_files.items():
+            for format, file_path in converted_data.items():
                 message += f"  {format.upper()}: {file_path}\n"
+            message += f"  NLP Result: {nlp_result}\n"
 
         if errors:
             message += "\nErrors encountered:\n"
-            for input_file, error in errors.items():
-                message += f"Error processing {input_file}: {error}\n"
+            for error_type, error_message in errors.items():
+                message += f"Error in {error_type}: {error_message}\n"
 
         QMessageBox.information(self, "Processing Complete", message)
         logging.info("Document processing completed successfully")
@@ -270,9 +340,37 @@ class AIGentGUI(QMainWindow):
         if reply == QMessageBox.Yes:
             os.startfile(self.output_edit.text())
 
+    def training_data_finished(self, results, errors):
+        message = "Training data generation complete.\n\n"
+        message += f"Total files processed: {len(results)}\n"
+        message += "\nOutput files:\n"
+        for result in results:
+            input_file = result['input_file']
+            output_dir = result['output_dir']
+            message += f"Processed {input_file}:\n"
+            message += f"  Output directory: {output_dir}\n"
+            message += f"  Generated files:\n"
+            message += f"    pc_training_data.jsonl\n"
+            message += f"    qa_training_data.jsonl\n"
+
+        if errors:
+            message += "\nErrors encountered:\n"
+            for error_type, error_message in errors.items():
+                message += f"Error in {error_type}: {error_message}\n"
+
+        QMessageBox.information(self, "Training Data Generation Complete", message)
+        logging.info("Training data generation completed successfully")
+
+        # Option to open output directory
+        reply = QMessageBox.question(self, "Open Output Directory", 
+                                     "Do you want to open the output directory?",
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            os.startfile(self.output_edit.text())
+
     def generate_summary(self, results):
         total_files = len(results)
-        total_pages = sum(len(output_files) for output_files in results.values())
+        total_pages = sum(len(result['converted_data']) for result in results)
         
         summary = f"Total files processed: {total_files}\n"
         summary += f"Total pages processed: {total_pages}\n"

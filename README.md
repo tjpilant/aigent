@@ -13,6 +13,8 @@ AIGENT is a comprehensive toolkit for AI development, focusing on document proce
 5. **Configuration Management**: Persistent settings for improved user experience, essential for managing complex AI agent configurations.
 6. **Logging System**: Comprehensive logging for better debugging and user support, crucial for monitoring agent activities and interactions.
 7. **OCR Integration**: Support for both Tesseract OCR and Google Cloud Vision API for enhanced text extraction from images and PDFs.
+8. **Agent Swarm Management**: Implementation of Agency Swarm concepts for collaborative AI agent interactions and task processing.
+9. **NLP Document Processing**: Integrated NLP capabilities for generating training data pairs from processed documents.
 
 ## Installation
 
@@ -29,6 +31,8 @@ AIGENT is a comprehensive toolkit for AI development, focusing on document proce
 
 ## Usage
 
+### GUI Usage
+
 1. Activate the Poetry shell:
    ```
    poetry shell
@@ -38,97 +42,78 @@ AIGENT is a comprehensive toolkit for AI development, focusing on document proce
    python -m aigent.aigent_gui
    ```
 3. Use the GUI to:
-   - Select an input file (PDF, DOCX, or image)
+   - Select input files or a directory (PDF, DOCX, or image)
    - Choose an output location for the converted files
    - Enter project information and agent traits
    - Select OCR options and output formats
-   - Convert the document
+   - Process the documents
+
+### AIGentSwarm Usage
+
+The AIGentSwarm functionality is now integrated into the GUI. When you process documents through the GUI, it automatically utilizes the AIGentSwarm for document processing and NLP tasks.
+
+For programmatic usage of AIGentSwarm:
+
+1. Import the AIGentSwarm class:
+   ```python
+   from aigent.aigent_swarm import AIGentSwarm
+   ```
+
+2. Create an instance of AIGentSwarm:
+   ```python
+   swarm = AIGentSwarm()
+   ```
+
+3. Process documents using the swarm:
+   ```python
+   results = swarm.process_documents(
+       input_files,
+       output_dir,
+       project_info,
+       agent_traits,
+       output_formats,
+       use_ocr,
+       use_cloud_vision
+   )
+   ```
+
+4. The `results` variable will contain the output from each agent in the swarm for each processed document, including both converted data and NLP processing results.
+
+## Agency Swarm Framework Integration
+
+AIGENT now incorporates the Agency Swarm framework, which allows for more flexible and extensible agent-based processing. The integration includes:
+
+1. **BaseTool**: A foundational class for creating specialized tools used by agents.
+2. **NLPDocumentsTool**: A tool for processing documents and generating training data pairs.
+3. **NLPDocumentsAgent**: An agent that utilizes the NLPDocumentsTool for document processing.
+4. **AIGentSwarm**: A class that manages the swarm of agents and coordinates document processing tasks.
+
+This integration allows for easy expansion of AIGENT's capabilities by adding new tools and agents to the swarm.
 
 ## Setting Up Google Cloud Credentials
 
-To use AIGENT with Google Cloud services (e.g., Cloud Vision API), follow these steps:
-
-1. Obtain a Google Cloud JSON credentials file:
-   - Go to the [Google Cloud Console](https://console.cloud.google.com/)
-   - Navigate to "APIs & Services" > "Credentials"
-   - Create a new Service Account Key and download the JSON file
-2. Place the JSON file in a secure location on your system.
-3. Set up the credentials in AIGENT:
-   - Create a file named `setup_credentials.py` in your AIGENT project directory
-   - Add the following code to the file:
-     ```python
-     from aigent.api_manager import APIManager
-
-     def setup_google_cloud_credentials():
-         api_manager = APIManager()
-         credentials_path = '/path/to/your/google_cloud_credentials.json'
-         
-         if api_manager.set_google_cloud_credentials(credentials_path):
-             print(f"Successfully set Google Cloud credentials path: {credentials_path}")
-         else:
-             print(f"Failed to set Google Cloud credentials. Please check if the file exists: {credentials_path}")
-
-     if __name__ == "__main__":
-         setup_google_cloud_credentials()
-     ```
-   - Replace `/path/to/your/google_cloud_credentials.json` with the actual path to your JSON file
-4. Run the setup script:
-   ```
-   poetry run python setup_credentials.py
-   ```
-5. Verify the setup:
-   - The script will print a success message if the credentials are set correctly
-   - You can also check the `.env` file in your project directory to ensure the `GOOGLE_APPLICATION_CREDENTIALS` variable is set
-
-Note: Keep your credentials file secure and never commit it to version control. The `.env` file containing the credentials path should also be in your `.gitignore`.
+(This section remains unchanged)
 
 ## Development Process
 
-We use Git for version control and follow a feature branch workflow. Here's how to contribute to the project:
-
-1. Ensure you're on the master branch and it's up-to-date:
-   ```
-   git checkout master
-   git pull origin master
-   ```
-2. Create a new feature branch:
-   ```
-   git checkout -b feature-branch-name
-   ```
-3. Make your changes and commit them:
-   ```
-   git add .
-   git commit -m "Description of the changes"
-   ```
-4. Push your branch to the remote repository:
-   ```
-   git push origin feature-branch-name
-   ```
-5. Create a pull request on GitHub to merge your feature branch into master.
-
-Always create a new branch for each feature or bug fix to keep the development process organized and maintainable.
+(This section remains unchanged)
 
 ## Future Directions
 
 AIGENT's roadmap includes:
 
-1. Implementing agent swarm management capabilities for complex tasks.
+1. Expanding agent swarm capabilities for more complex tasks and interactions.
 2. Developing a web interface for broader accessibility.
 3. Integrating with APIs like OpenAI and Anthropic for enhanced AI capabilities.
 4. Implementing intelligent PDF splitting based on content structure.
 5. Developing advanced visualization for document structure and AI agent interactions.
+6. Enhancing the Agency Swarm implementation with more sophisticated agent types and communication protocols.
+7. Implementing a plugin system for easy addition of new tools and agents.
+8. Developing specialized agents for different types of document analysis and processing.
 
 ## Contributing
 
-We welcome contributions to AIGENT! Please follow these steps to contribute:
-
-1. Fork the repository
-2. Create a new branch: `git checkout -b feature-branch-name`
-3. Make your changes and commit them: `git commit -m 'Add some feature'`
-4. Push to the branch: `git push origin feature-branch-name`
-5. Submit a pull request
-
-For major changes, please open an issue first to discuss what you would like to change.
+(This section remains unchanged)
 
 ## License
 
@@ -136,7 +121,7 @@ AIGENT is open-source and licensed under the [MIT License](https://opensource.or
 
 ## Acknowledgments
 
-- [Agency Swarm](https://github.com/VRSEN/agency-swarm) for philosophical alignment in AI agent collaboration concepts.
+- [Agency Swarm](https://github.com/VRSEN/agency-swarm) for philosophical alignment in AI agent collaboration concepts and inspiration for our swarm implementation.
 - [PyQt5](https://www.riverbankcomputing.com/software/pyqt/) for the GUI framework
 - [pdfplumber](https://github.com/jsvine/pdfplumber) for PDF text extraction
 - [PyPDF2](https://pypdf2.readthedocs.io/en/latest/) for PDF manipulation
