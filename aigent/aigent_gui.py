@@ -1,52 +1,59 @@
 # File: aigent/aigent_gui.py
 # Author: Tj Pilant
-# Description: GUI for the AIGent application
-# Version: 0.9.4
+# Description: Web GUI for the AIGent application
+# Version: 1.1.7
 
 import logging
 import os
-import sys
-import sqlite3
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
-from PyQt5.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QComboBox,
-    QFileDialog,
-    QGroupBox,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QMainWindow,
-    QMessageBox,
-    QProgressBar,
-    QPushButton,
-    QVBoxLayout,
-    QWidget,
-    QMenuBar,
-    QMenu,
-    QAction,
-    QInputDialog,
-)
+from flask import Flask, render_template, request, jsonify
+from flask_wtf import FlaskForm
+from flask_wtf.file import MultipleFileField
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired, ValidationError
+from werkzeug.utils import secure_filename
 
 from aigent.ai_service import AIService
 from aigent.api_manager import APIManager
-from aigent.models import AgentTraits, ProjectInfo
 from aigent.aigent_swarm import AIGentSwarm
 from aigent.agency_swarm.swarm import Swarm, Agency
 from aigent.init_database import init_database
 
 # Set up logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
-# ... [Keep all the existing thread classes] ...
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', 'default-secret-key')
+app.config['UPLOAD_FOLDER'] = 'uploads'
+BASE_OUTPUT_DIR = os.environ.get('BASE_OUTPUT_DIR', '/safe/output/directory')
 
-class AIGentGUI(QMainWindow):
+# Ensure the UPLOAD_FOLDER exists
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+
+class ProcessingForm(FlaskForm):
+    input_files = MultipleFileField('Select Input Files', validators=[DataRequired()])
+    output_directory = StringField('Output Directory', validators=[DataRequired()])
+    submit = SubmitField('Process Files')
+
+    def validate_output_directory(self, field):
+        full_path = os.path.abspath(field.data)
+        if not full_path.startswith(BASE_OUTPUT_DIR):
+            raise ValidationError('Invalid output directory')
+        if not os.path.isdir(full_path):
+            raise ValidationError('Output directory does not exist')
+
+    def validate_input_files(self, field):
+        if not field.data:
+            raise ValidationError('At least one file must be selected')
+
+
+class AIGentGUI:
     def __init__(self):
-        super().__init__()
-        logging.info("Initializing AIGentGUI")
+        logging.info("AIGentGUI __init__ started")
         try:
-            # Initialize the database
             init_database()
             logging.info("Database initialized successfully")
 
@@ -57,63 +64,118 @@ class AIGentGUI(QMainWindow):
             self.agency = Agency("MainAgency", "agent_descriptors.db")
             self.swarm.add_agency(self.agency)
             logging.info("Services initialized successfully")
-        except Exception as e:
-            logging.error(f"Error initializing services: {str(e)}")
-            QMessageBox.critical(self, "Initialization Error", f"Failed to initialize services: {str(e)}")
+        except (OSError, IOError) as e:
+            logging.error("Error initializing services: %s", str(e))
             raise
-        self.initUI()
-        logging.info("AIGentGUI initialized")
+        except Exception as e:
+            logging.error("Unexpected error initializing services: %s", str(e))
+            raise
 
-    def initUI(self):
-        # ... [Keep the existing UI setup code] ...
+        logging.info("AIGentGUI __init__ completed")
 
-    # ... [Keep all the existing methods] ...
-
-    def create_gpt_agent(self):
-        profession, ok = QInputDialog.getText(self, 'Create GPT Agent', 'Enter the profession for the new GPT agent:')
-        if ok and profession:
+    def process_documents(self, file_paths):
+        results = []
+        for file_path in file_paths:
             try:
-                new_agent = self.agency.create_gpt_agent(profession)
-                QMessageBox.information(self, "Agent Created", f"New GPT agent created for profession: {profession}")
-                logging.info(f"Created new GPT agent for profession: {profession}")
-            except sqlite3.IntegrityError:
-                QMessageBox.warning(self, "Error", f"An agent for the profession '{profession}' already exists.")
-                logging.warning(f"Attempted to create duplicate agent for profession: {profession}")
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to create GPT agent: {str(e)}")
-                logging.error(f"Error creating GPT agent: {str(e)}")
+                # Process the document (implementation needed)
+                result = f"Processed {file_path}"
+                results.append(result)
+                logging.info(result)
+            except (FileNotFoundError, PermissionError) as e:
+                error_msg = f"Error accessing {file_path}: {str(e)}"
+                results.append(error_msg)
+                logging.error(error_msg)
+            except (IOError, ValueError) as e:
+                error_msg = f"Error processing {file_path}: {str(e)}"
+                results.append(error_msg)
+                logging.error(error_msg)
+        return results
 
-    def list_gpt_agents(self):
-        try:
-            agents = self.agency.agents
-            if not agents:
-                QMessageBox.information(self, "GPT Agents", "No GPT agents have been created yet.")
-            else:
-                agent_list = "\n".join([str(agent) for agent in agents])
-                QMessageBox.information(self, "GPT Agents", f"Current GPT Agents:\n\n{agent_list}")
-            logging.info("Listed all GPT agents")
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to list GPT agents: {str(e)}")
-            logging.error(f"Error listing GPT agents: {str(e)}")
+    def create_gpt_agent(self, profession):
+        return self.agency.create_gpt_agent(profession)
 
-    def process_documents(self):
-        # ... [Keep the existing process_documents method] ...
-        # Add the following lines at the end of the method:
+    def get_gpt_agents(self):
+        return self.agency.get_gpt_agents()
+
+
+aigent_gui = AIGentGUI()
+
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    form = ProcessingForm()
+    if form.validate_on_submit():
+        input_files = request.files.getlist('input_files')
+        output_directory = form.output_directory.data
+
+        # Ensure the output directory exists
+        os.makedirs(output_directory, exist_ok=True)
+
+        # Save uploaded files
+        file_paths = []
+        for file in input_files:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            file_paths.append(file_path)
+
+        # Process files
         try:
-            # Use GPT agents in document processing
-            for agent in self.agency.agents:
-                agent_result = agent.run({"task": "process_document", "document": "sample_text"})
-                logging.info(f"GPT Agent {agent} processed document: {agent_result}")
+            results = aigent_gui.process_documents(file_paths)
+        except (IOError, ValueError, FileNotFoundError, PermissionError) as e:
+            logging.error("Error processing documents: %s", str(e))
+            results = [f"Error processing documents: {str(e)}"]
         except Exception as e:
-            QMessageBox.warning(self, "GPT Agent Processing Error", f"Error while using GPT agents: {str(e)}")
-            logging.error(f"Error in GPT agent document processing: {str(e)}")
+            logging.exception("Unexpected error during processing: %s", str(e))
+            results = ["An unexpected error occurred during processing"]
+
+        return render_template('results.html', results=results)
+
+    return render_template('index.html', form=form)
+
+
+@app.route('/create_gpt_agent', methods=['POST'])
+def create_gpt_agent():
+    profession = request.json.get('profession')
+    if not profession:
+        return jsonify({"error": "No profession provided"}), 400
+
+    try:
+        aigent_gui.create_gpt_agent(profession)
+        return jsonify({
+            "message": f"New GPT agent created for profession: {profession}"
+        }), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except (IOError, RuntimeError) as e:
+        logging.error("Error creating GPT agent: %s", str(e))
+        return jsonify({"error": f"Error creating GPT agent: {str(e)}"}), 500
+    except Exception as e:
+        logging.exception("Unexpected error creating GPT agent: %s", str(e))
+        return jsonify({
+            "error": "An unexpected error occurred while creating the agent"
+        }), 500
+
+
+@app.route('/list_gpt_agents', methods=['GET'])
+def list_gpt_agents():
+    try:
+        agents = aigent_gui.get_gpt_agents()
+        agent_list = [str(agent) for agent in agents]
+        return jsonify({"agents": agent_list}), 200
+    except (IOError, ValueError) as e:
+        logging.error("Error listing GPT agents: %s", str(e))
+        return jsonify({"error": f"Error listing GPT agents: {str(e)}"}), 500
+    except Exception as e:
+        logging.exception("Unexpected error listing GPT agents: %s", str(e))
+        return jsonify({"error": "An unexpected error occurred while listing agents"}), 500
+
 
 def main():
     logging.info("Starting main application")
-    app = QApplication(sys.argv)
-    ex = AIGentGUI()
-    ex.show()
-    sys.exit(app.exec_())
+    app.run(debug=False, host='0.0.0.0')
+
 
 if __name__ == "__main__":
     main()
+    
