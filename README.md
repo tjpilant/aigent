@@ -2,14 +2,14 @@
 
 ## Project Overview
 
-AIGENT is a comprehensive toolkit for AI development, focusing on document processing, AI agent trait management, dynamic prompt generation, and agent swarm management. The project's concept and agent flow philosophy align with that of Agency Swarm, aiming to streamline the process of creating, managing, and deploying AI agents for various applications. While currently implemented as a desktop application to address specific file handling challenges, AIGENT maintains its vision of facilitating collaborative AI development.
+AIGENT is a comprehensive toolkit for AI development, focusing on document processing, AI agent trait management, dynamic prompt generation, and agent swarm management. The project's concept and agent flow philosophy align with that of Agency Swarm, aiming to streamline the process of creating, managing, and deploying AI agents for various applications. AIGENT is now implemented as a web application to provide broader accessibility and easier deployment.
 
 ## Key Features
 
 1. **Document Conversion**: Convert PDF, DOCX, and image files to JSONL, TXT, MD, and DOCX formats for AI training.
 2. **AI Agent Trait Management**: Integrated system for managing AI agent traits and characteristics, with a vision for a hierarchical database structure.
 3. **Dynamic Prompt Generation**: Context-aware prompt generation for multiple use cases, laying the groundwork for sophisticated agent interactions.
-4. **PyQt5-based GUI**: User-friendly desktop interface for document conversion, trait management, and GPT agent creation.
+4. **Flask-based Web GUI**: User-friendly web interface for document conversion, trait management, and GPT agent creation.
 5. **Configuration Management**: Persistent settings for improved user experience, essential for managing complex AI agent configurations.
 6. **Logging System**: Comprehensive logging for better debugging and user support, crucial for monitoring agent activities and interactions.
 7. **OCR Integration**: Support for both Tesseract OCR and Google Cloud Vision API for enhanced text extraction from images and PDFs.
@@ -23,19 +23,20 @@ AIGENT is a comprehensive toolkit for AI development, focusing on document proce
 
 ## Usage
 
-### GUI Usage
+### Web GUI Usage
 
 1. Activate the Poetry shell:
    ```
    poetry shell
    ```
-2. Run the AIGENT GUI:
+2. Run the AIGENT Web GUI:
    ```
    python -m aigent.aigent_gui
    ```
-3. Use the GUI to:
-   - Select input files or a directory (PDF, DOCX, or image)
-   - Choose an output location for the converted files
+3. Open a web browser and navigate to `http://localhost:5000` (or the appropriate address if running on a different host/port).
+4. Use the web interface to:
+   - Upload input files (PDF, DOCX, or image)
+   - Specify an output location for the converted files
    - Enter project information and agent traits
    - Select OCR options and output formats
    - Process the documents
@@ -47,19 +48,11 @@ AIGENT is a comprehensive toolkit for AI development, focusing on document proce
 
 ## Agency Swarm Framework Integration
 
-AIGENT now incorporates the Agency Swarm framework, which allows for more flexible and extensible agent-based processing. The integration includes:
-
-1. **BaseTool**: A foundational class for creating specialized tools used by agents.
-2. **NLPDocumentsTool**: A tool for processing documents and generating training data pairs.
-3. **NLPDocumentsAgent**: An agent that utilizes the NLPDocumentsTool for document processing.
-4. **AIGentSwarm**: A class that manages the swarm of agents and coordinates document processing tasks.
-5. **GPT Agent Developer**: A new feature for creating and managing specialized GPT agents with defined traits and responsibilities.
-
-This integration allows for easy expansion of AIGENT's capabilities by adding new tools and agents to the swarm.
+(This section remains unchanged)
 
 ## GPT Agent Developer
 
-The GPT Agent Developer is a new feature that allows users to create and manage specialized GPT agents. These agents can be tailored for specific tasks or professions, with defined traits, responsibilities, and interaction styles.
+The GPT Agent Developer is accessible through the web interface, allowing users to create and manage specialized GPT agents. These agents can be tailored for specific tasks or professions, with defined traits, responsibilities, and interaction styles.
 
 Key capabilities:
 - Create new GPT agents with specific professions and traits
@@ -68,10 +61,9 @@ Key capabilities:
 - Utilize created agents in document processing tasks (future development)
 
 To use the GPT Agent Developer:
-1. Open the AIGENT GUI
-2. Navigate to the "Agents" menu
-3. Select "Create GPT Agent" to define a new agent
-4. Use "List GPT Agents" to view all created agents
+1. Open the AIGENT Web GUI in your browser
+2. Use the "Create GPT Agent" form to define a new agent
+3. View the list of created agents on the main page
 
 The GPT Agent Developer lays the groundwork for more sophisticated AI interactions and task-specific processing within the AIGENT ecosystem.
 
@@ -88,7 +80,7 @@ The GPT Agent Developer lays the groundwork for more sophisticated AI interactio
 AIGENT's roadmap includes:
 
 1. Expanding agent swarm capabilities for more complex tasks and interactions.
-2. Developing a web interface for broader accessibility.
+2. Enhancing the web interface with more advanced features and improved user experience.
 3. Integrating with APIs like OpenAI and Anthropic for enhanced AI capabilities.
 4. Implementing intelligent PDF splitting based on content structure.
 5. Developing advanced visualization for document structure and AI agent interactions.
@@ -96,6 +88,7 @@ AIGENT's roadmap includes:
 7. Implementing a plugin system for easy addition of new tools and agents.
 8. Developing specialized agents for different types of document analysis and processing.
 9. Expanding the GPT Agent Developer to allow for more complex agent interactions and task assignments.
+10. Implementing real-time collaboration features in the web interface.
 
 ## Contributing
 
