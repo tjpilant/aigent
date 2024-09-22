@@ -1,17 +1,15 @@
-print("Initializing AIGentGUI")
-from aigent import ai_service
-from aigent import api_manager
-from aigent import file_converter
-from aigent import image_converter
-from aigent import aigent_gui
-print("AIGentGUI initialized")
+from . import ai_service
+from . import api_manager
+from . import file_converter
+from . import image_converter
+from . import aigent_gui
+from . import init_database
 
-if __name__ == "__main__":
-    print("Starting main")
-    app = QApplication(sys.argv)
-    print("QApplication created")
-    ex = AIGentGUI()
-    print("AIGentGUI instance created")
-    ex.show()
-    print("show() called on AIGentGUI instance")
-    sys.exit(app.exec_())
+__all__ = [
+    'ai_service',
+    'api_manager',
+    'file_converter',
+    'image_converter',
+    'aigent_gui',
+    'init_database'
+]

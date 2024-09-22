@@ -1,10 +1,11 @@
 from typing import List, Dict, Any
-from .agent import Agent
-from .agents.gpt_agent_developer import GPTAgentDeveloper, GPTAgent
+from aigent.agency_swarm.agent import Agent
+from aigent.agency_swarm.agents.gpt_agent_developer import GPTAgentDeveloper, GPTAgent
 
 class Agency:
     def __init__(self, name: str, db_path: str):
         self.name = name
+        self.db_path = db_path
         self.agents: List[Agent] = []
         self.gpt_agent_developer = GPTAgentDeveloper(db_path=db_path)
 
@@ -14,7 +15,7 @@ class Agency:
     def remove_agent(self, agent: Agent):
         self.agents.remove(agent)
 
-    def create_gpt_agent(self, profession: str):
+    def create_gpt_agent(self, profession: str) -> Agent:
         result = self.gpt_agent_developer.run(profession)
         new_agent = result['agent']
         self.add_agent(new_agent)
@@ -26,7 +27,7 @@ class Agency:
     def process_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
         results = {}
         for agent in self.agents:
-            result = agent.run(task)
+            result = agent.process(task)
             results[str(agent)] = result
         return results
 
