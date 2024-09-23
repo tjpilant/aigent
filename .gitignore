@@ -41,3 +41,6 @@ updated_generate_oauth_token.py
 
 # Exclude DevNotes folder
 DevNotes/
+
+# Exclude cmcourse directory
+/home/tjpilant/aiengineers/aigent/cmcourse
