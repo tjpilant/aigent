@@ -44,3 +44,13 @@ DevNotes/
 
 # Exclude cmcourse directory
 /home/tjpilant/aiengineers/aigent/cmcourse
+
+# Database files
+*.db
+
+# Test files and output
+aigent/test_document.txt
+aigent/test_output/
+
+# Exclude test script (if it's not meant to be in version control)
+# aigent/test_aigent_functionality.py
