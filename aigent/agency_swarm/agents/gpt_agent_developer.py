@@ -1,6 +1,6 @@
 import sqlite3
 from typing import Dict, Any
-from agency_swarm.tools import BaseTool
+from ..tools.base_tool import BaseTool
 from pydantic import Field
 
 class GPTAgentDeveloper(BaseTool):
@@ -95,8 +95,8 @@ class GPTAgent(BaseTool):
         """
         response = f"As a {self.profession}, I have processed the document.\n"
         response += f"Key insights based on {self.key_responsibilities}:\n"
-        response += f"1. [Insert insight related to the document]\n"
-        response += f"2. [Insert another insight]\n"
+        response += "1. [Insert insight related to the document]\n"
+        response += "2. [Insert another insight]\n"
         response += f"Potential challenges identified: {self.typical_challenges}\n"
         response += f"Relevant projects: {self.current_projects}\n"
         response += f"Follow-up questions: {self.follow_up_questions}"
@@ -107,9 +107,9 @@ class GPTAgent(BaseTool):
         Generate training data based on the agent's expertise.
         """
         response = f"As a {self.profession}, I have generated training data from the document.\n"
-        response += f"Training data format: [Specify format, e.g., Q&A pairs, labeled entities]\n"
-        response += f"1. [Example training data point]\n"
-        response += f"2. [Another example training data point]\n"
+        response += "Training data format: [Specify format, e.g., Q&A pairs, labeled entities]\n"
+        response += "1. [Example training data point]\n"
+        response += "2. [Another example training data point]\n"
         response += f"Key terminology used: {self.jargon_terminology}\n"
         response += f"Data generation approach: {self.collaborative_approach}"
         return response

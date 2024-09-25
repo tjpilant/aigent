@@ -30,7 +30,16 @@ class AIGentSwarm:
                 use_cloud_vision
             )
             
-            text_content = converted_data.get('content', '')
+            # Extract text content from the converted data
+            text_content = ""
+            for format, file_path in converted_data.items():
+                if format == 'txt':
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        text_content = f.read()
+                    break
+            
+            if not text_content:
+                logging.warning(f"No text content found for file: {input_file}")
             
             nlp_result = self.nlp_documents_agent.process_document(text_content, output_dir)
             

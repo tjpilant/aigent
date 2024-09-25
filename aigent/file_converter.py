@@ -1,7 +1,7 @@
 # File: file_converter.py
 # Author: Tj Pilant
 # Description: Handles conversion of various file types to JSONL and other formats
-# Version: 0.5.0
+# Version: 0.5.2
 
 import json
 import logging
@@ -29,7 +29,7 @@ class FileConverter:
         self.image_converter = ImageConverter()
 
     def convert_file(self, input_file, output_dir, project_info, agent_traits, output_formats=['jsonl'], use_ocr=True, use_cloud_vision=False):
-        logging.debug(f"Starting convert_file method")
+        logging.debug("Starting convert_file method")
         logging.debug(f"Type of project_info: {type(project_info)}")
         logging.debug(f"Type of agent_traits: {type(agent_traits)}")
         
@@ -41,6 +41,8 @@ class FileConverter:
             return self.convert_image(input_file, output_dir, project_info, agent_traits, output_formats, use_ocr, use_cloud_vision)
         elif file_extension == '.docx':
             return self.convert_docx(input_file, output_dir, project_info, agent_traits, output_formats)
+        elif file_extension == '.txt':
+            return self.convert_txt(input_file, output_dir, project_info, agent_traits, output_formats)
         else:
             raise ValueError(f"Unsupported file format: {file_extension}")
 
@@ -89,6 +91,17 @@ class FileConverter:
             logging.error(f"Error converting DOCX: {str(e)}")
             raise
 
+    def convert_txt(self, input_file, output_dir, project_info, agent_traits, output_formats):
+        try:
+            with open(input_file, 'r', encoding='utf-8') as file:
+                text = file.read()
+            pages = [text]  # Treat the entire text file as a single page
+            
+            return self.process_text(pages, input_file, output_dir, project_info, agent_traits, output_formats)
+        except Exception as e:
+            logging.error(f"Error converting TXT: {str(e)}")
+            raise
+
     def process_text(self, pages, input_file, output_dir, project_info, agent_traits, output_formats):
         output_files = {}
         
@@ -116,7 +129,7 @@ class FileConverter:
         return output_files
 
     def save_as_jsonl(self, pages, output_file, project_info, agent_traits):
-        logging.debug(f"Starting save_as_jsonl method")
+        logging.debug("Starting save_as_jsonl method")
         logging.debug(f"Type of project_info: {type(project_info)}")
         logging.debug(f"Type of agent_traits: {type(agent_traits)}")
         
@@ -149,7 +162,7 @@ class FileConverter:
                     json.dump(entry, jsonl_file)
                     jsonl_file.write('\n')
             
-            logging.debug(f"Completed save_as_jsonl method")
+            logging.debug("Completed save_as_jsonl method")
         except Exception as e:
             logging.error(f"Error in save_as_jsonl method: {str(e)}")
             raise

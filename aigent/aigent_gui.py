@@ -1,21 +1,13 @@
 # File: aigent/aigent_gui.py
 # Author: Tj Pilant
 # Description: GUI for the AIGent application
-<<<<<<< Updated upstream
-# Version: 0.9.4
-=======
 # Version: 0.9.5
->>>>>>> Stashed changes
 
 import logging
 import os
 import sys
 import sqlite3
-<<<<<<< Updated upstream
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
-=======
 from PyQt5.QtCore import QThread, pyqtSignal
->>>>>>> Stashed changes
 from PyQt5.QtWidgets import (
     QApplication,
     QCheckBox,
@@ -45,7 +37,56 @@ from aigent.init_database import init_database
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# ... [Keep all the existing thread classes] ...
+class ProcessingThread(QThread):
+    progress_update = pyqtSignal(int, int)
+    processing_complete = pyqtSignal(list, dict)
+
+    def __init__(self, aigent_swarm, input_files, output_dir, project_info, agent_traits, output_formats, use_ocr, use_cloud_vision):
+        super().__init__()
+        self.aigent_swarm = aigent_swarm
+        self.input_files = input_files
+        self.output_dir = output_dir
+        self.project_info = project_info
+        self.agent_traits = agent_traits
+        self.output_formats = output_formats
+        self.use_ocr = use_ocr
+        self.use_cloud_vision = use_cloud_vision
+
+    def run(self):
+        try:
+            results = self.aigent_swarm.process_documents(
+                self.input_files,
+                self.output_dir,
+                self.project_info,
+                self.agent_traits,
+                self.output_formats,
+                self.use_ocr,
+                self.use_cloud_vision
+            )
+            self.processing_complete.emit(results, {})
+        except Exception as e:
+            self.processing_complete.emit([], {"processing_error": str(e)})
+        
+        self.progress_update.emit(len(self.input_files), len(self.input_files))
+
+class TrainingDataThread(QThread):
+    progress_update = pyqtSignal(int, int)
+    processing_complete = pyqtSignal(list, dict)
+
+    def __init__(self, aigent_swarm, input_files, output_dir):
+        super().__init__()
+        self.aigent_swarm = aigent_swarm
+        self.input_files = input_files
+        self.output_dir = output_dir
+
+    def run(self):
+        try:
+            results = self.aigent_swarm.generate_training_data(self.input_files, self.output_dir)
+            self.processing_complete.emit(results, {})
+        except Exception as e:
+            self.processing_complete.emit([], {"processing_error": str(e)})
+        
+        self.progress_update.emit(len(self.input_files), len(self.input_files))
 
 class AIGentGUI(QMainWindow):
     def __init__(self):
@@ -71,38 +112,6 @@ class AIGentGUI(QMainWindow):
         logging.info("AIGentGUI initialized")
 
     def initUI(self):
-<<<<<<< Updated upstream
-        # ... [Keep the existing UI setup code] ...
-
-    # ... [Keep all the existing methods] ...
-
-    def create_gpt_agent(self):
-        profession, ok = QInputDialog.getText(self, 'Create GPT Agent', 'Enter the profession for the new GPT agent:')
-        if ok and profession:
-            try:
-                new_agent = self.agency.create_gpt_agent(profession)
-                QMessageBox.information(self, "Agent Created", f"New GPT agent created for profession: {profession}")
-                logging.info(f"Created new GPT agent for profession: {profession}")
-            except sqlite3.IntegrityError:
-                QMessageBox.warning(self, "Error", f"An agent for the profession '{profession}' already exists.")
-                logging.warning(f"Attempted to create duplicate agent for profession: {profession}")
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to create GPT agent: {str(e)}")
-                logging.error(f"Error creating GPT agent: {str(e)}")
-
-    def list_gpt_agents(self):
-        try:
-            agents = self.agency.agents
-            if not agents:
-                QMessageBox.information(self, "GPT Agents", "No GPT agents have been created yet.")
-            else:
-                agent_list = "\n".join([str(agent) for agent in agents])
-                QMessageBox.information(self, "GPT Agents", f"Current GPT Agents:\n\n{agent_list}")
-            logging.info("Listed all GPT agents")
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to list GPT agents: {str(e)}")
-            logging.error(f"Error listing GPT agents: {str(e)}")
-=======
         self.setWindowTitle("AIGent: Intelligent Document Processor")
         self.setGeometry(100, 100, 600, 500)
 
@@ -225,7 +234,6 @@ class AIGentGUI(QMainWindow):
         directory = QFileDialog.getExistingDirectory(self, "Select Output Directory")
         if directory:
             self.output_edit.setText(directory)
->>>>>>> Stashed changes
 
     def create_gpt_agent(self):
         profession, ok = QInputDialog.getText(self, 'Create GPT Agent', 'Enter the profession for the new GPT agent:')
@@ -255,14 +263,6 @@ class AIGentGUI(QMainWindow):
             logging.error(f"Error listing GPT agents: {str(e)}")
 
     def process_documents(self):
-<<<<<<< Updated upstream
-        # ... [Keep the existing process_documents method] ...
-        # Add the following lines at the end of the method:
-        try:
-            # Use GPT agents in document processing
-            for agent in self.agency.agents:
-                agent_result = agent.run({"task": "process_document", "document": "sample_text"})
-=======
         logging.info("Starting document processing")
         input_path = self.input_edit.text()
         output_dir = self.output_edit.text()
@@ -321,13 +321,10 @@ class AIGentGUI(QMainWindow):
             # Use GPT agents in document processing
             for agent in self.agency.agents:
                 agent_result = agent.process({"task": "process_document", "document": "sample_text"})
->>>>>>> Stashed changes
                 logging.info(f"GPT Agent {agent} processed document: {agent_result}")
         except Exception as e:
             QMessageBox.warning(self, "GPT Agent Processing Error", f"Error while using GPT agents: {str(e)}")
             logging.error(f"Error in GPT agent document processing: {str(e)}")
-<<<<<<< Updated upstream
-=======
 
     def generate_training_data(self):
         logging.info("Starting training data generation")
@@ -387,7 +384,7 @@ class AIGentGUI(QMainWindow):
                                      "Do you want to open the output directory?",
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            os.startfile(self.output_edit.text())
+            self.open_output_directory()
 
     def training_data_finished(self, results, errors):
         message = "Training data generation complete.\n\n"
@@ -415,7 +412,18 @@ class AIGentGUI(QMainWindow):
                                      "Do you want to open the output directory?",
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            os.startfile(self.output_edit.text())
+            self.open_output_directory()
+
+    def open_output_directory(self):
+        output_dir = self.output_edit.text()
+        if sys.platform == "win32":
+            os.startfile(output_dir)
+        elif sys.platform == "darwin":
+            import subprocess
+            subprocess.Popen(["open", output_dir])
+        else:
+            import subprocess
+            subprocess.Popen(["xdg-open", output_dir])
 
     def generate_summary(self, results):
         total_files = len(results)
@@ -425,7 +433,6 @@ class AIGentGUI(QMainWindow):
         summary += f"Total pages processed: {total_pages}\n"
         
         return summary
->>>>>>> Stashed changes
 
 def main():
     logging.info("Starting main application")
