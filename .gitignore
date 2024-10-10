@@ -54,3 +54,6 @@ aigent/test_output/
 
 # Exclude test script (if it's not meant to be in version control)
 # aigent/test_aigent_functionality.py
+
+# Ignore all config.json files
+config.json
