@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
 # Virtual environment
 venv/
 
@@ -39,6 +40,12 @@ aigent/DevNotes
 setup_credentials.py
 updated_generate_oauth_token.py
 
+# Google Cloud Service Account Credentials
+aigent-430602-ba4f3db6c362.json
+aiocr-gcv-api.json
+
+# Google OAuth Client Credentials
+client_secret_997980018332-v1pnpb3gm94i8u4dqm3fg29jfb84dai4.apps.googleusercontent.com.json
 # Exclude DevNotes folder
 DevNotes/
 
