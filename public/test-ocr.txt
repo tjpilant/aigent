@@ -1,6 +1,0 @@
-This is a test document for OCR processing.
-It contains multiple lines of text.
-We'll use this to verify that our OCR functionality is working correctly.
-123 456 789
-ABCDEFGHIJKLMNOPQRSTUVWXYZ
-abcdefghijklmnopqrstuvwxyz
