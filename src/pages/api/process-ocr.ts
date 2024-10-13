@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingForm, File } from 'formidable';
 import fs from 'fs';
 import path from 'path';
+import jwt from 'jsonwebtoken';
 import { GoogleCloudVisionOCRTool } from '../../tools/GoogleCloudVisionOCRTool';
 
 export const config = {
@@ -9,6 +10,9 @@ export const config = {
     bodyParser: false,
   },
 };
+
+const OCR_RESULTS_DIR = process.env.OCR_RESULTS_DIR || path.join(process.cwd(), '..', 'ocr-results');
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // Make sure to set this in production
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('OCR processing started');
@@ -18,21 +22,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const uploadDir = path.join(process.cwd(), 'uploads');
-  const outputDir = path.join(process.cwd(), 'public', 'ocr-results');
+  const uploadDir = path.join(process.cwd(), '..', 'uploads');
   
   // Create directories if they don't exist
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
+  if (!fs.existsSync(OCR_RESULTS_DIR)) {
+    fs.mkdirSync(OCR_RESULTS_DIR, { recursive: true });
   }
 
   const form = new IncomingForm({
     uploadDir: uploadDir,
     keepExtensions: true,
-    multiples: true,
+    multiples: false,
   });
 
   form.parse(req, async (err, fields, files) => {
@@ -45,90 +48,74 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('Files:', files);
 
     const ocrMethod = Array.isArray(fields.ocrMethod) ? fields.ocrMethod[0] : fields.ocrMethod;
+    const file = Array.isArray(files.file) ? files.file[0] : files.file;
 
-    if (!files || !ocrMethod) {
+    if (!file || !ocrMethod) {
       console.log('Missing required fields');
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     try {
-      const results: string[] = [];
-      const downloadUrls: string[] = [];
-      const originalFilenames: string[] = [];
+      if (ocrMethod === 'google') {
+        console.log('Processing file:', file.originalFilename);
+        const inputFilePath = file.filepath;
+        const originalFileName = file.originalFilename || 'unnamed';
+        const outputFileName = `${path.parse(originalFileName).name}_ocr_result.md`;
+        const outputFilePath = path.join(OCR_RESULTS_DIR, outputFileName);
 
-      const fileArray = Object.values(files).flat();
-      console.log('Number of files to process:', fileArray.length);
+        // Use GitHub secrets for credentials
+        const credentials = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+        const projectId = process.env.GOOGLE_CLOUD_PROJECT_ID;
+        const processorId = process.env.GOOGLE_CLOUD_PROCESSOR_ID;
 
-      for (const file of fileArray) {
-        if (file && ocrMethod === 'google') {
-          console.log('Processing file:', file.originalFilename);
-          const inputFilePath = file.filepath;
-          const originalFileName = file.originalFilename || 'unnamed';
-          const outputFileName = `${path.parse(originalFileName).name}_ocr_result.md`;
-          const outputFilePath = path.join(outputDir, outputFileName);
-
-          // Use the credentials file directly
-          const credentialsPath = '/home/tjpilant/aiengineers/aigent/aiocr-gcv-api.json';
-          
-          if (!fs.existsSync(credentialsPath)) {
-            throw new Error('Google Cloud credentials file not found');
-          }
-
-          const credentialsContent = fs.readFileSync(credentialsPath, 'utf8');
-          const credentialsJson = JSON.parse(credentialsContent);
-
-          if (!credentialsJson.client_email) {
-            throw new Error('Invalid Google Cloud credentials: missing client_email');
-          }
-
-          const projectId = credentialsJson.project_id;
-          const processorId = "cdbb7ba4f9c316d0";
-
-          if (!projectId) {
-            throw new Error('Google Cloud project ID not found in credentials');
-          }
-
-          const ocrTool = new GoogleCloudVisionOCRTool({
-            input_file_path: inputFilePath,
-            output_md_file_path: outputFilePath,
-            credentials_json: credentialsJson,
-            processor_id: processorId,
-            project_id: projectId,
-          });
-
-          await ocrTool.run();
-          console.log('OCR processing completed for:', originalFileName);
-          
-          // Clean up the uploaded file
-          fs.unlinkSync(inputFilePath);
-
-          // Generate download URL
-          const downloadUrl = `/ocr-results/${outputFileName}`;
-
-          results.push(`OCR processing complete for ${originalFileName}`);
-          downloadUrls.push(downloadUrl);
-          originalFilenames.push(originalFileName);
-        } else if (file && ocrMethod === 'tesseract') {
-          // TODO: Implement Tesseract OCR processing
-          console.log('Tesseract OCR not implemented for:', file.originalFilename);
-          results.push(`Tesseract OCR not yet implemented for ${file.originalFilename}`);
-          downloadUrls.push('');
-          originalFilenames.push(file.originalFilename || 'unnamed');
-        } else {
-          console.log('Invalid OCR method or file');
-          throw new Error('Invalid OCR method or file');
+        if (!credentials || !projectId || !processorId) {
+          throw new Error('Missing Google Cloud credentials or configuration');
         }
-      }
 
-      console.log('OCR processing completed for all files');
-      res.status(200).json({ results, downloadUrls, originalFilenames });
+        const ocrTool = new GoogleCloudVisionOCRTool({
+          input_file_path: inputFilePath,
+          output_md_file_path: outputFilePath,
+          credentials_json: JSON.parse(credentials),
+          processor_id: processorId,
+          project_id: projectId,
+        });
+
+        await ocrTool.run();
+        console.log('OCR processing completed for:', originalFileName);
+        
+        // Clean up the uploaded file
+        fs.unlinkSync(inputFilePath);
+
+        // Generate a token for secure file access
+        const token = generateToken(outputFileName);
+
+        res.status(200).json({ 
+          result: `OCR processing complete for ${originalFileName}`,
+          fileToken: token,
+          originalFilename: originalFileName
+        });
+      } else if (ocrMethod === 'tesseract') {
+        console.log('Tesseract OCR not implemented for:', file.originalFilename);
+        res.status(200).json({ 
+          result: `Tesseract OCR not yet implemented for ${file.originalFilename}`,
+          fileToken: '',
+          originalFilename: file.originalFilename || 'unnamed'
+        });
+      } else {
+        console.log('Invalid OCR method');
+        throw new Error('Invalid OCR method');
+      }
     } catch (error) {
       console.error('Error processing OCR:', error);
       if (error instanceof Error && error.message.includes('Document exceeds the 15-page limit')) {
-        res.status(400).json({ error: 'One or more documents exceed the 15-page limit for OCR processing. Please upload smaller documents.' });
+        res.status(400).json({ error: 'The document exceeds the 15-page limit for OCR processing. Please upload a smaller document.' });
       } else {
         res.status(500).json({ error: 'Error processing OCR: ' + (error instanceof Error ? error.message : String(error)) });
       }
     }
   });
+}
+
+function generateToken(filename: string): string {
+  return jwt.sign({ filename }, JWT_SECRET, { expiresIn: '1h' });
 }

@@ -25,10 +25,15 @@ export class GoogleCloudVisionOCRTool extends Tool {
   }
 
   async run(): Promise<string> {
-    const client = await this.initializeClient();
-    const documentText = await this.processDocument(client);
-    await this.saveAsMarkdown(documentText);
-    return `Markdown file created at: ${this.config.output_md_file_path}`;
+    try {
+      const client = await this.initializeClient();
+      const documentText = await this.processDocument(client);
+      await this.saveAsMarkdown(documentText);
+      return `Markdown file created at: ${this.config.output_md_file_path}`;
+    } catch (error) {
+      console.error('Error in GoogleCloudVisionOCRTool:', error);
+      throw error;
+    }
   }
 
   private async initializeClient(): Promise<DocumentProcessorServiceClient> {
@@ -54,12 +59,17 @@ export class GoogleCloudVisionOCRTool extends Tool {
         },
       });
 
-      return result.document?.text || '';
+      if (!result.document?.text) {
+        throw new Error('No text extracted from the document');
+      }
+
+      return result.document.text;
     } catch (error: any) {
       if (error.code === 3 && error.details.includes('Document pages exceed the limit')) {
         throw new Error('Document exceeds the 15-page limit for OCR processing.');
       }
-      throw error;
+      console.error('Error processing document:', error);
+      throw new Error(`Error processing document: ${error.message}`);
     }
   }
 

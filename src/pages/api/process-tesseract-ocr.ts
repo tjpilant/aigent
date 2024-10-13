@@ -10,6 +10,8 @@ export const config = {
   },
 };
 
+const OCR_RESULTS_DIR = process.env.OCR_RESULTS_DIR || path.join(process.cwd(), '..', 'ocr-results');
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('Tesseract OCR processing started');
 
@@ -18,9 +20,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const uploadDir = path.join(process.cwd(), 'uploads');
+  
+  // Create directories if they don't exist
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+  if (!fs.existsSync(OCR_RESULTS_DIR)) {
+    fs.mkdirSync(OCR_RESULTS_DIR, { recursive: true });
+  }
+
   const form = new IncomingForm({
-    uploadDir: '/tmp',
+    uploadDir: uploadDir,
     keepExtensions: true,
+    multiples: false,
   });
 
   form.parse(req, async (err, fields, files) => {
@@ -32,8 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('Fields:', fields);
     console.log('Files:', files);
 
-    const fileKey = Object.keys(files)[0];
-    const file = Array.isArray(files[fileKey]) ? files[fileKey][0] : files[fileKey];
+    const file = Array.isArray(files.file) ? files.file[0] : files.file;
 
     if (!file) {
       console.error('No file uploaded');
@@ -43,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       console.log('Processing file:', file.originalFilename);
       const outputFileName = `${path.parse(file.originalFilename || '').name}_ocr_result.md`;
-      const outputFilePath = path.join(process.cwd(), 'public', 'ocr-results', outputFileName);
+      const outputFilePath = path.join(OCR_RESULTS_DIR, outputFileName);
 
       console.log('Output file path:', outputFilePath);
 
@@ -55,13 +67,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Clean up the uploaded file
       fs.unlinkSync(file.filepath);
 
-      const downloadUrl = `/ocr-results/${outputFileName}`;
+      const downloadUrl = `/api/serve-ocr-result?filename=${encodeURIComponent(outputFileName)}`;
 
-      console.log('OCR processing completed successfully');
       res.status(200).json({
         result: `OCR processing complete for ${file.originalFilename}`,
         downloadUrl,
-        originalFilename: file.originalFilename,
+        originalFilename: file.originalFilename || 'unnamed'
       });
     } catch (error: unknown) {
       console.error('Error processing OCR:', error);
