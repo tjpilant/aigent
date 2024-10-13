@@ -1,0 +1,36 @@
+# Dependencies
+/node_modules
+
+# Next.js build output
+/.next
+/out
+
+# Environment variables
+.env*
+!.env.example
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE and editor files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.swp
+
+# Coverage reports
+/coverage
+
+# OCR related directories (now outside the project)
+/uploads
+/ocr-results
+
+# Optional: Dependency lock files
+# yarn.lock
+# package-lock.json
